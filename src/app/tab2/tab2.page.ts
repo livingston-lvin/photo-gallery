@@ -16,7 +16,8 @@ import { addIcons } from 'ionicons';
 import { camera } from 'ionicons/icons';
 import { PhotoService } from '../services/photo.service';
 import { CommonModule, NgFor } from '@angular/common';
-
+import { ActionSheetController } from '@ionic/angular';
+import { UserPhoto } from '../interfaces/user-photo.interface';
 @Component({
   selector: 'app-tab2',
   templateUrl: 'tab2.page.html',
@@ -33,11 +34,11 @@ import { CommonModule, NgFor } from '@angular/common';
     IonCol,
     IonImg,
     IonRow,
-    NgFor
+    NgFor,
   ],
 })
 export class Tab2Page implements OnInit{
-  constructor(public photoService: PhotoService) {
+  constructor(public photoService: PhotoService,public actionSheetController: ActionSheetController) {
     addIcons({ camera });
   }
   
@@ -48,4 +49,28 @@ export class Tab2Page implements OnInit{
   addPhotoToGallery() {
     this.photoService.addNewToGallery();
   }
+
+  public async showActionSheet(photo: UserPhoto, position: number) {
+    const actionSheet = await this.actionSheetController.create({
+      header: 'Photos',
+      buttons: [{
+        text: 'Delete',
+        role: 'destructive',
+        icon: 'trash',
+        handler: () => {
+          this.photoService.deletePicture(photo, position);
+        }
+      }, {
+        text: 'Cancel',
+        icon: 'close',
+        role: 'cancel',
+        handler: () => {
+          // Nothing to do, action sheet is automatically closed
+          }
+      }]
+    });
+    await actionSheet.present();
+  }
+
+  
 }
